@@ -203,14 +203,23 @@ for name, model in models.items():
         'true_positive': cm[1, 1]
     }
     
+    # Atualizar melhor modelo
     if f1 > best_f1:
         best_f1 = f1
         best_model = model
 
-# 6. Salvar o melhor modelo e o scaler
+# Salvar métricas dos modelos
+results_df = pd.DataFrame(results).T
+results_df.to_csv('model_metrics.csv')
+
+# Salvar o melhor modelo, scaler e smote
 joblib.dump(best_model, 'best_model.joblib')
 joblib.dump(scaler, 'scaler.joblib')
 joblib.dump(smote, 'smote.joblib')
+
+print("\n=== Melhor Modelo ===")
+print(f"Modelo: {best_model.__class__.__name__}")
+print(f"F1-Score: {best_f1:.4f}")
 
 # 7. Criar um oráculo para previsão
 def predict_diabetes(pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree, age):
@@ -245,10 +254,6 @@ print("\n=== Exemplo de Previsão ===")
 pred, prob = predict_diabetes(6, 148, 72, 35, 0, 33.6, 0.627, 50)
 print(f"Previsão: {'Diabético' if pred == 1 else 'Não Diabético'}")
 print(f"Probabilidade: {prob[1]:.2%} de ser diabético")
-
-# 8. Salvar métricas do modelo para Power BI
-metrics_df = pd.DataFrame(results).T
-metrics_df.to_csv('model_metrics.csv')
 
 # 9. Gerar exemplos de previsão para Power BI
 sample_predictions = []
